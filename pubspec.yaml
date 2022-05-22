@@ -1,4 +1,4 @@
-name: game_template
+name: candy_man
 description: A mobile game built in Flutter.
 
 # Prevent accidental publishing to pub.dev.
@@ -28,6 +28,8 @@ dependencies:
   games_services: ^2.0.7  # Achievements and leaderboards
   google_mobile_ads: ^1.1.0  # Ads
   in_app_purchase: ^3.0.1  # In-app purchases
+
+  flame: ^1.1.1
 
 dev_dependencies:
   flutter_test:

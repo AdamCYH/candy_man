@@ -71,15 +71,45 @@ void guardedMain() {
   WidgetsFlutterBinding.ensureInitialized();
 
   _log.info('Going full screen');
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.edgeToEdge,
-  );
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 
+  // TODO: When ready, uncomment the following lines to enable integrations.
+  //       Read the README for more info on each integration.
+
+  AdsController? adsController;
+  // if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
+  //   /// Prepare the google_mobile_ads plugin so that the first ad loads
+  //   /// faster. This can be done later or with a delay if startup
+  //   /// experience suffers.
+  //   adsController = AdsController(MobileAds.instance);
+  //   adsController.initialize();
+  // }
+
+  GamesServicesController? gamesServicesController;
+  // if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
+  //   gamesServicesController = GamesServicesController()
+  //     // Attempt to log the player in.
+  //     ..initialize();
+  // }
+
+  InAppPurchaseController? inAppPurchaseController;
+  // if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
+  //   inAppPurchaseController = InAppPurchaseController(InAppPurchase.instance)
+  //     // Subscribing to [InAppPurchase.instance.purchaseStream] as soon
+  //     // as possible in order not to miss any updates.
+  //     ..subscribe();
+  //   // Ask the store what the player has bought already.
+  //   inAppPurchaseController.restorePurchases();
+  // }
 
   runApp(
     MyApp(
       settingsPersistence: LocalStorageSettingsPersistence(),
       playerProgressPersistence: LocalStoragePlayerProgressPersistence(),
+      inAppPurchaseController: inAppPurchaseController,
+      adsController: adsController,
+      gamesServicesController: gamesServicesController,
     ),
   );
 }
@@ -104,18 +134,10 @@ class MyApp extends StatelessWidget {
                 routes: [
                   GoRoute(
                     path: 'session/:level',
-                    pageBuilder: (context, state) {
-                      final levelNumber = int.parse(state.params['level']!);
-                      final level = gameLevels
-                          .singleWhere((e) => e.number == levelNumber);
-                      return buildMyTransition(
-                        child: PlaySessionScreen(
-                          level,
-                          key: const Key('play session'),
-                        ),
-                        color: context.watch<Palette>().backgroundPlaySession,
-                      );
-                    },
+                    pageBuilder: (context, state) => buildMyTransition(
+                      child: PlaySessionScreen(),
+                      color: context.watch<Palette>().backgroundPlaySession,
+                    ),
                   ),
                   GoRoute(
                     path: 'won',
@@ -146,9 +168,18 @@ class MyApp extends StatelessWidget {
 
   final SettingsPersistence settingsPersistence;
 
+  final GamesServicesController? gamesServicesController;
+
+  final InAppPurchaseController? inAppPurchaseController;
+
+  final AdsController? adsController;
+
   const MyApp({
     required this.playerProgressPersistence,
     required this.settingsPersistence,
+    required this.inAppPurchaseController,
+    required this.adsController,
+    required this.gamesServicesController,
     super.key,
   });
 
@@ -164,6 +195,11 @@ class MyApp extends StatelessWidget {
               return progress;
             },
           ),
+          Provider<GamesServicesController?>.value(
+              value: gamesServicesController),
+          Provider<AdsController?>.value(value: adsController),
+          ChangeNotifierProvider<InAppPurchaseController?>.value(
+              value: inAppPurchaseController),
           Provider<SettingsController>(
             lazy: false,
             create: (context) => SettingsController(
