@@ -3,17 +3,26 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:candy_man/src/game/candy_man_game.dart';
+import 'package:candy_man/src/style/palette.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
-class PlaySessionScreen extends StatelessWidget {
+class GameScreen extends StatefulWidget {
   static final _log = Logger('PlaySessionScreen');
 
-  const PlaySessionScreen({super.key});
+  const GameScreen({super.key});
 
   @override
+  _GameScreenState createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  @override
   Widget build(BuildContext context) {
-    return GameWidget(game: CandyManGame());
+    return GameWidget(
+        game: CandyManGame(
+            color: Provider.of<Palette>(context), debugMode: true));
   }
 }
