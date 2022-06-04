@@ -31,6 +31,8 @@ class Joystick extends PositionComponent with HasGameRef<CandyManGame> {
   Future<void> onLoad() async {
     super.onLoad();
     _log.info("Loading joystick");
+
+    this.positionType = PositionType.viewport;
     loadJoystick();
   }
 

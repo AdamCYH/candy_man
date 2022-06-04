@@ -63,7 +63,8 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
           idle();
           return;
         case ActionType.dropBubble:
-          gameRef.add(Bubble.dropByPlayer(player: this, gridSize: gridSize, debugMode: debugMode));
+          gameRef.gameWorld.dropBubble(Bubble.dropByPlayer(
+              player: this, gridSize: gridSize, debugMode: debugMode));
           return;
         default:
           return;
@@ -80,7 +81,10 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
       return;
     }
 
-    this.position += _moveDirection.normalized() * _speed * dt;
+    var toPosition = this.position + _moveDirection.normalized() * _speed * dt;
+    if (canMoveTo(toPosition)) {
+      this.position = toPosition;
+    }
   }
 
   void walkUp() {
@@ -111,6 +115,13 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
     _playerState = PlayerState.idle;
     _moveDirection = Vector2(0, 0);
     this.animation = _idleAnimation;
+  }
+
+  bool canMoveTo(Vector2 position) {
+    return position.x >= 0 &&
+        position.x <= gameRef.worldSize.x - gameRef.gridSize.x &&
+        position.y >= 0 &&
+        position.y <= gameRef.worldSize.y - gameRef.gridSize.y;
   }
 
   @override

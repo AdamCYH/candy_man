@@ -15,12 +15,16 @@ class ActionButtons extends PositionComponent with HasGameRef<CandyManGame> {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
+    this.positionType = PositionType.viewport;
     add(_dropBubbleButton());
+    debugMode = true;
   }
 
-  ButtonComponent _dropBubbleButton() {
-    return ButtonComponent(
+  HudButtonComponent _dropBubbleButton() {
+    return HudButtonComponent(
         button: CircleComponent(radius: 30, paint: buttonPaint),
+        position: Vector2.all(0),
         onPressed: () => actionController
             .input(ActionEvent(actionType: ActionType.dropBubble)));
   }
