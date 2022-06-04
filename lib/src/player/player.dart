@@ -1,5 +1,6 @@
+import 'package:candy_man/src/elements/bubble.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
-import 'package:candy_man/src/joy_stick/joy_stick_controller.dart';
+import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:flame/components.dart';
 
 class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
@@ -10,8 +11,9 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
   static const playerSpriteMap = {"m1": "Male 01-1.png"};
 
   final String character;
-  final JoystickController joystickController;
+  final ActionController actionController;
 
+  final Vector2 gridSize;
   final _spriteSize = Vector2.all(32.0);
   double _speed = 300;
 
@@ -30,32 +32,40 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
 
   Player(
       {required this.character,
-      required this.joystickController,
+      required this.actionController,
+      required this.gridSize,
       bool debugMode = false})
       : assert(playerSpriteMap.containsKey(character)) {
     super.debugMode = debugMode;
+    super.priority = 100;
   }
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     _loadAnimations();
 
-    joystickController.onFire.listen((event) {
-      switch (event.direction) {
-        case Direction.up:
+    actionController.onFire.listen((event) {
+      switch (event.actionType) {
+        case ActionType.moveUp:
           walkUp();
           return;
-        case Direction.down:
+        case ActionType.moveDown:
           walkDown();
           return;
-        case Direction.left:
+        case ActionType.moveLeft:
           walkLeft();
           return;
-        case Direction.right:
+        case ActionType.moveRight:
           walkRight();
           return;
-        case Direction.idle:
+        case ActionType.idle:
           idle();
+          return;
+        case ActionType.dropBubble:
+          gameRef.add(Bubble.dropByPlayer(player: this, gridSize: gridSize, debugMode: debugMode));
+          return;
+        default:
           return;
       }
     });
@@ -107,8 +117,7 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
 
-    this.width = 100;
-    this.height = 100;
+    this.size = gridSize;
   }
 
   Future<void> _loadAnimations() async {
