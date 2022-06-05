@@ -11,7 +11,8 @@ import 'package:logging/logging.dart';
 
 import '../style/palette.dart';
 
-class CandyManGame extends FlameGame with HasTappables, HasDraggables {
+class CandyManGame extends FlameGame
+    with HasTappables, HasDraggables, HasCollisionDetection {
   static final _log = Logger('CandyManGame');
 
   final Vector2 gameGridLayout = Vector2(16, 12);

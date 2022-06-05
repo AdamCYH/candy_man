@@ -1,9 +1,8 @@
 import 'package:candy_man/src/elements/bubble_component.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_model.dart';
+import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:flame/components.dart';
-
-typedef void OnBubbleStateChange(BubbleState bubbleState);
 
 class BubbleModel extends GameElement with CountDownMixin {
   static const explosionDuration = 0.5;
@@ -23,12 +22,15 @@ class BubbleModel extends GameElement with CountDownMixin {
     required this.player,
     required this.position,
     countDown = 2.0,
+    OnElementDestroy? onBubbleDestroy,
     this.debugMode = false,
   }) : _bubbleState = BubbleState.pending {
     _countDownTimer = Timer(countDown,
         onTick: () => {bubbleState = BubbleState.blowing}, autoStart: false);
-    _explosionTimer = Timer(countDown + explosionDuration,
-        onTick: () => {bubbleState = BubbleState.destroyed}, autoStart: false);
+    _explosionTimer = Timer(countDown + explosionDuration, onTick: () {
+      bubbleState = BubbleState.destroyed;
+      onBubbleDestroy?.call();
+    }, autoStart: false);
   }
 
   @override

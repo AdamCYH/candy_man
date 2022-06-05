@@ -28,7 +28,7 @@ class PlayerModel extends GameElement with MovableMixin {
       {required this.character,
       required this.actionController,
       required this.position,
-      this.speed = 300,
+      this.speed = 150,
       this.collidable = true,
       this.debugMode = false})
       : _playerMovementState = PlayerMovementState.idle;
@@ -57,14 +57,6 @@ class PlayerModel extends GameElement with MovableMixin {
     }
 
     return position;
-  }
-
-  bool _canMoveTo(Vector2 position) {
-    if (boundary == null) return true;
-    return position.x >= 0 &&
-        position.x <= boundary!.x &&
-        position.y >= 0 &&
-        position.y <= boundary!.y;
   }
 
   PlayerMovementState get playerMovementState => _playerMovementState;
@@ -102,6 +94,14 @@ class PlayerModel extends GameElement with MovableMixin {
   }
 
   void dropBubble() {}
+
+  bool _canMoveTo(Vector2 position) {
+    if (boundary == null) return true;
+    return position.x >= 0 &&
+        position.x <= boundary!.x &&
+        position.y >= 0 &&
+        position.y <= boundary!.y;
+  }
 }
 
 enum PlayerMovementState { movingUp, movingDown, movingLeft, movingRight, idle }

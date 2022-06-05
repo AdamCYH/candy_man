@@ -5,7 +5,8 @@ import 'package:flame/components.dart';
 
 const playerSpriteMap = {"m1": "Male 01-1.png"};
 
-class PlayerComponent extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
+class PlayerComponent extends SpriteAnimationComponent
+    with HasGameRef<CandyManGame> {
   static const _animationFrameAmount = 3;
   static const _animationStepTime = 0.1;
   static const _animationPerRow = 3;
@@ -62,6 +63,7 @@ class PlayerComponent extends SpriteAnimationComponent with HasGameRef<CandyManG
           playerModel.idle();
           return;
         case ActionType.dropBubble:
+          // TODO(adam): Move this logic to [playerModel].
           gameRef.gameWorld.dropBubble(playerModel);
           return;
         default:
@@ -86,11 +88,6 @@ class PlayerComponent extends SpriteAnimationComponent with HasGameRef<CandyManG
     _setPlayerBoundary();
   }
 
-  void _setPlayerBoundary() {
-    playerModel.boundary = Vector2(gameRef.worldSize.x - gameRef.gridSize.x,
-        gameRef.worldSize.y - gameRef.gridSize.y);
-  }
-
   void updateMovementState(PlayerMovementState playerMovementState) {
     switch (playerMovementState) {
       case PlayerMovementState.movingUp:
@@ -110,6 +107,11 @@ class PlayerComponent extends SpriteAnimationComponent with HasGameRef<CandyManG
         animation = _idleAnimation;
         return;
     }
+  }
+
+  void _setPlayerBoundary() {
+    playerModel.boundary = Vector2(gameRef.worldSize.x - gameRef.gridSize.x,
+        gameRef.worldSize.y - gameRef.gridSize.y);
   }
 
   Future<void> _loadAnimations() async {

@@ -6,6 +6,10 @@ import 'package:candy_man/src/game/candy_man_game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 
+const cameraSafeZone = 20.0;
+
+typedef void OnElementDestroy();
+
 class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
   var _players = <PlayerComponent>[];
 
@@ -25,8 +29,11 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
     _players.add(player);
     add(player);
     gameRef.camera.followComponent(player,
-        worldBounds:
-            Rect.fromLTRB(0, 0, gameRef.worldSize.x, gameRef.worldSize.y));
+        worldBounds: Rect.fromLTRB(
+            0 - cameraSafeZone,
+            0 - cameraSafeZone,
+            gameRef.worldSize.x + cameraSafeZone,
+            gameRef.worldSize.y + cameraSafeZone));
   }
 
   void addOtherPlayer(PlayerComponent player) {
@@ -35,7 +42,30 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
   }
 
   void dropBubble(PlayerModel player) {
-    var bubble = BubbleModel(player: player, position: player.position);
+    var indexPosition = toIndexPosition(player.position);
+    var x = indexPosition[0];
+    var y = indexPosition[1];
+    if (tileMap[x][y] != null) {
+      return;
+    }
+    var bubble = BubbleModel(
+        player: player,
+        position: toPixelPosition(toIndexPosition(player.position)),
+        onBubbleDestroy: () {
+          tileMap[x][y] = null;
+        });
+    tileMap[x][y] = bubble;
     add(bubble.create());
+  }
+
+  List<int> toIndexPosition(Vector2 position) {
+    var x = (position.x / gameRef.gridSize.x).round();
+    var y = (position.y / gameRef.gridSize.y).round();
+    return [x, y];
+  }
+
+  Vector2 toPixelPosition(List<int> index) {
+    return Vector2(
+        index[0] * gameRef.gridSize.x, index[1] * gameRef.gridSize.y);
   }
 }
