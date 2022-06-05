@@ -41,21 +41,23 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
     add(player);
   }
 
-  void dropBubble(PlayerModel player) {
+  BubbleModel? dropBubble(PlayerModel player) {
     var indexPosition = toIndexPosition(player.position);
     var x = indexPosition[0];
     var y = indexPosition[1];
     if (tileMap[x][y] != null) {
-      return;
+      return null;
     }
     var bubble = BubbleModel(
         player: player,
         position: toPixelPosition(toIndexPosition(player.position)),
         onBubbleDestroy: () {
           tileMap[x][y] = null;
-        });
+        },
+        debugMode: player.debugMode);
     tileMap[x][y] = bubble;
     add(bubble.create());
+    return bubble;
   }
 
   List<int> toIndexPosition(Vector2 position) {

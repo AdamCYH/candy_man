@@ -1,5 +1,6 @@
 import 'package:candy_man/src/elements/bubble_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 class BubbleComponent extends SpriteAnimationComponent
@@ -20,6 +21,9 @@ class BubbleComponent extends SpriteAnimationComponent
 
     this.position = bubbleModel.position;
     this.size = gameRef.gridSize;
+
+    add(CircleHitbox.relative(0.7,
+        parentSize: size, position: Vector2.all(size.x * 0.3 / 2)));
   }
 
   BubbleComponent.dropByPlayer(
@@ -31,6 +35,8 @@ class BubbleComponent extends SpriteAnimationComponent
 
     bubbleModel.countDown(dt);
   }
+
+  bool get collidable => bubbleModel.collidable;
 
   void updateBubbleStateChange(BubbleState bubbleState) {
     switch (bubbleState) {

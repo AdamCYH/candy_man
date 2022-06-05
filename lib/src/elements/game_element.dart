@@ -4,6 +4,8 @@ import 'package:flame/components.dart';
  * Elements that can be displayed on a game world.
  */
 abstract class GameElement {
+  Component? get component;
+
   Vector2 get position;
 
   ElementType get elementType;
@@ -31,11 +33,6 @@ mixin MovableMixin on GameElement {
    * Move to a new position.
    */
   Vector2 moveTo(Vector2 newPosition);
-
-  /**
-   * Move for dt seconds.
-   */
-  Vector2 moveFor(double dt);
 }
 
 /**

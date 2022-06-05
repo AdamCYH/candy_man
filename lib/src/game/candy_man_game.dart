@@ -1,3 +1,4 @@
+import 'package:candy_man/src/elements/bubble_model.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
@@ -44,7 +45,10 @@ class CandyManGame extends FlameGame
         character: 'm1',
         actionController: actionController,
         position: Vector2.zero(),
-        debugMode: true);
+        debugMode: debugMode);
+
+//    add(player.create());
+//    add(BubbleModel(player: player, position: Vector2(0,0),debugMode: ).create());
 
     gameWorld.addMyPlayer(player.create());
     add(Joystick(actionController: actionController, debugMode: debugMode));

@@ -1,12 +1,14 @@
+import 'package:candy_man/src/elements/bubble_component.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 const playerSpriteMap = {"m1": "Male 01-1.png"};
 
 class PlayerComponent extends SpriteAnimationComponent
-    with HasGameRef<CandyManGame> {
+    with HasGameRef<CandyManGame>, CollisionCallbacks {
   static const _animationFrameAmount = 3;
   static const _animationStepTime = 0.1;
   static const _animationPerRow = 3;
@@ -39,6 +41,7 @@ class PlayerComponent extends SpriteAnimationComponent
     super.priority = _playerPriority;
 
     _setPlayerBoundary();
+    add(CircleHitbox());
 
     _loadAnimations();
 
@@ -63,8 +66,7 @@ class PlayerComponent extends SpriteAnimationComponent
           playerModel.idle();
           return;
         case ActionType.dropBubble:
-          // TODO(adam): Move this logic to [playerModel].
-          gameRef.gameWorld.dropBubble(playerModel);
+          playerModel.dropBubble(gameRef.gameWorld);
           return;
         default:
           playerModel.idle();
@@ -86,6 +88,26 @@ class PlayerComponent extends SpriteAnimationComponent
 
     this.size = gameRef.gridSize;
     _setPlayerBoundary();
+  }
+
+  @override
+  void onCollisionStart(Set<Vector2> points, PositionComponent other) {
+    super.onCollisionStart(points, other);
+
+    if (other is ScreenHitbox) {
+      //...
+    } else if (other is BubbleComponent) {
+      playerModel.collisionStart(other.bubbleModel);
+    }
+  }
+
+  @override
+  void onCollisionEnd(PositionComponent other) {
+    super.onCollisionEnd(other);
+    if (other is BubbleComponent) {
+      playerModel.stepOutOfBubble(other);
+      playerModel.collisionEnd(other.bubbleModel);
+    }
   }
 
   void updateMovementState(PlayerMovementState playerMovementState) {

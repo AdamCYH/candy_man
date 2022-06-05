@@ -18,7 +18,7 @@ class ActionButtons extends PositionComponent with HasGameRef<CandyManGame> {
 
     this.positionType = PositionType.viewport;
     add(_dropBubbleButton());
-    debugMode = true;
+    debugMode = debugMode;
   }
 
   HudButtonComponent _dropBubbleButton() {
