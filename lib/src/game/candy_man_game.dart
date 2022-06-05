@@ -1,8 +1,9 @@
+import 'package:candy_man/src/elements/game_element.dart';
+import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_buttons.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:candy_man/src/joy_stick/joy_stick.dart';
-import 'package:candy_man/src/elements/player.dart';
 import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import '../style/palette.dart';
 class CandyManGame extends FlameGame with HasTappables, HasDraggables {
   static final _log = Logger('CandyManGame');
 
+  final Vector2 gameGridLayout = Vector2(16, 12);
   final Palette color;
   bool debugMode;
   late Vector2 worldSize;
@@ -31,18 +33,19 @@ class CandyManGame extends FlameGame with HasTappables, HasDraggables {
 
     onGameResize(this.size);
 
-    gameWorld = GameWorld();
+    gameWorld = GameWorld(tileMap: _createTestTileMap());
 
     add(gameWorld);
 
     var actionController = ActionController();
-    var player = Player(
-        character: "m1",
-        actionController: actionController,
-        gridSize: gridSize,
-        debugMode: debugMode);
 
-    gameWorld.addMyPlayer(player);
+    var player = PlayerModel(
+        character: 'm1',
+        actionController: actionController,
+        position: Vector2.zero(),
+        debugMode: true);
+
+    gameWorld.addMyPlayer(player.create());
     add(Joystick(actionController: actionController, debugMode: debugMode));
     add(ActionButtons(
         actionController: actionController, debugMode: debugMode));
@@ -55,7 +58,21 @@ class CandyManGame extends FlameGame with HasTappables, HasDraggables {
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
 
-    worldSize = Vector2(size.x, size.x / 4 * 3);
-    gridSize = Vector2(worldSize.x / 16, worldSize.y / 12);
+    worldSize = Vector2(size.x, size.x / gameGridLayout.x * gameGridLayout.y);
+    gridSize =
+        Vector2(worldSize.x / gameGridLayout.x, worldSize.y / gameGridLayout.y);
+  }
+
+  List<List<GameElement?>> _createTestTileMap() {
+    var tileMap = <List<GameElement?>>[];
+    for (int i = 0; i < gameGridLayout.x; i++) {
+      var row = <GameElement?>[];
+      for (int j = 0; j < gameGridLayout.y; j++) {
+        row.add(null);
+      }
+      tileMap.add(row);
+    }
+
+    return tileMap;
   }
 }

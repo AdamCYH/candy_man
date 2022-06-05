@@ -1,4 +1,4 @@
-import 'package:flame/game.dart';
+import 'package:flame/components.dart';
 
 /**
  * Elements that can be displayed on a game world.
@@ -9,6 +9,11 @@ abstract class GameElement {
   ElementType get elementType;
 
   bool get collidable;
+
+  /**
+   * Creates flame component from element model.
+   */
+  Component create();
 }
 
 enum ElementType {
@@ -22,7 +27,15 @@ enum ElementType {
  * Mixin for elements that can move.
  */
 mixin MovableMixin on GameElement {
+  /**
+   * Move to a new position.
+   */
   Vector2 moveTo(Vector2 newPosition);
+
+  /**
+   * Move for dt seconds.
+   */
+  Vector2 moveFor(double dt);
 }
 
 /**

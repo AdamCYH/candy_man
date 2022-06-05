@@ -1,4 +1,3 @@
-import 'package:candy_man/src/elements/bubble.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
@@ -6,10 +5,11 @@ import 'package:flame/components.dart';
 
 const playerSpriteMap = {"m1": "Male 01-1.png"};
 
-class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
+class PlayerComponent extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
   static const _animationFrameAmount = 3;
   static const _animationStepTime = 0.1;
   static const _animationPerRow = 3;
+  static const _playerPriority = 100;
 
   final _spriteSize = Vector2.all(32.0);
 
@@ -26,34 +26,22 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
   ActionType? _previousAction;
 
   final bool debugMode;
-  final String character;
-  final ActionController actionController;
-  final Vector2 gridSize;
 
-  late PlayerModel playerModel;
+  PlayerModel playerModel;
 
-  Player(
-      {required this.character,
-      required this.actionController,
-      required this.gridSize,
-      Vector2? position,
-      this.debugMode = false})
-      : assert(playerSpriteMap.containsKey(character)) {
-    super.priority = 100;
-
-    playerModel = PlayerModel(
-        position: position ?? Vector2.zero(),
-        onMovementStateChange: (playerMovementState) =>
-            _onMovementStateChange(playerMovementState));
-  }
+  PlayerComponent({required this.playerModel, this.debugMode = false})
+      : assert(playerSpriteMap.containsKey(playerModel.character));
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    super.priority = _playerPriority;
+
+    _setPlayerBoundary();
 
     _loadAnimations();
 
-    actionController.onFire.listen((event) {
+    playerModel.actionController.onFire.listen((event) {
       if (_previousAction == event.actionType) return;
 
       _previousAction = event.actionType;
@@ -74,8 +62,7 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
           playerModel.idle();
           return;
         case ActionType.dropBubble:
-          gameRef.gameWorld.dropBubble(Bubble.dropByPlayer(
-              player: this, gridSize: gridSize, debugMode: debugMode));
+          gameRef.gameWorld.dropBubble(playerModel);
           return;
         default:
           playerModel.idle();
@@ -88,28 +75,23 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
   void update(double dt) {
     super.update(dt);
 
-    var toPosition = this.position +
-        playerModel.moveDirection.normalized() * playerModel.speed * dt;
-    if (canMoveTo(toPosition)) {
-      this.position = toPosition;
-    }
+    position = playerModel.moveFor(dt);
   }
 
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
 
-    this.size = gridSize;
+    this.size = gameRef.gridSize;
+    _setPlayerBoundary();
   }
 
-  bool canMoveTo(Vector2 position) {
-    return position.x >= 0 &&
-        position.x <= gameRef.worldSize.x - gameRef.gridSize.x &&
-        position.y >= 0 &&
-        position.y <= gameRef.worldSize.y - gameRef.gridSize.y;
+  void _setPlayerBoundary() {
+    playerModel.boundary = Vector2(gameRef.worldSize.x - gameRef.gridSize.x,
+        gameRef.worldSize.y - gameRef.gridSize.y);
   }
 
-  void _onMovementStateChange(PlayerMovementState playerMovementState) {
+  void updateMovementState(PlayerMovementState playerMovementState) {
     switch (playerMovementState) {
       case PlayerMovementState.movingUp:
         animation = _walkUpAnimation;
@@ -137,7 +119,8 @@ class Player extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
     // 7 - 9 = run right
     // 10 - 12 = run up
 
-    final spriteSheet = await gameRef.images.load(playerSpriteMap[character]!);
+    final spriteSheet =
+        await gameRef.images.load(playerSpriteMap[playerModel.character]!);
     _idleAnimation = SpriteAnimation.fromFrameData(
         spriteSheet,
         SpriteAnimationData.sequenced(

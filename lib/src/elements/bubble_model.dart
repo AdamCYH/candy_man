@@ -1,5 +1,6 @@
+import 'package:candy_man/src/elements/bubble_component.dart';
 import 'package:candy_man/src/elements/game_element.dart';
-import 'package:candy_man/src/elements/player.dart';
+import 'package:candy_man/src/elements/player_model.dart';
 import 'package:flame/components.dart';
 
 typedef void OnBubbleStateChange(BubbleState bubbleState);
@@ -9,25 +10,25 @@ class BubbleModel extends GameElement with CountDownMixin {
 
   BubbleState _bubbleState;
 
-  OnBubbleStateChange? _onBubbleStateChange;
-
   late Timer _countDownTimer;
 
   late Timer _explosionTimer;
 
-  Player player;
+  bool debugMode;
+  PlayerModel player;
+
+  BubbleComponent? bubble;
 
   BubbleModel({
     required this.player,
     required this.position,
-    OnBubbleStateChange? onBubbleStateChange,
     countDown = 2.0,
-  })  : _onBubbleStateChange = onBubbleStateChange,
-        _bubbleState = BubbleState.pending {
-    _countDownTimer =
-        Timer(countDown, onTick: () => {bubbleState = BubbleState.blowing});
+    this.debugMode = false,
+  }) : _bubbleState = BubbleState.pending {
+    _countDownTimer = Timer(countDown,
+        onTick: () => {bubbleState = BubbleState.blowing}, autoStart: false);
     _explosionTimer = Timer(countDown + explosionDuration,
-        onTick: () => {bubbleState = BubbleState.destroyed});
+        onTick: () => {bubbleState = BubbleState.destroyed}, autoStart: false);
   }
 
   @override
@@ -40,6 +41,15 @@ class BubbleModel extends GameElement with CountDownMixin {
   Vector2 position;
 
   @override
+  BubbleComponent create() {
+    bubble =
+        BubbleComponent.dropByPlayer(bubbleModel: this, debugMode: debugMode);
+    _countDownTimer.start();
+    _explosionTimer.start();
+    return bubble!;
+  }
+
+  @override
   void countDown(double dt) {
     _countDownTimer.update(dt);
     _explosionTimer.update(dt);
@@ -49,7 +59,7 @@ class BubbleModel extends GameElement with CountDownMixin {
 
   set bubbleState(BubbleState state) {
     _bubbleState = state;
-    _onBubbleStateChange?.call(state);
+    bubble?.updateBubbleStateChange(state);
   }
 }
 
