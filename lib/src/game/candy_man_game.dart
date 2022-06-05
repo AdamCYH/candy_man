@@ -2,7 +2,7 @@ import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_buttons.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:candy_man/src/joy_stick/joy_stick.dart';
-import 'package:candy_man/src/player/player.dart';
+import 'package:candy_man/src/elements/player.dart';
 import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';

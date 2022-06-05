@@ -1,6 +1,6 @@
 import 'package:candy_man/src/elements/bubble.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
-import 'package:candy_man/src/player/player.dart';
+import 'package:candy_man/src/elements/player.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 

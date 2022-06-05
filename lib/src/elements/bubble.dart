@@ -1,50 +1,48 @@
+import 'package:candy_man/src/elements/bubble_model.dart';
+import 'package:candy_man/src/elements/player.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
-import 'package:candy_man/src/player/player.dart';
 import 'package:flame/components.dart';
 
 class Bubble extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
-  final bool debugMode;
-
-  final Player player;
-  final Vector2 gridSize;
-
-  Timer? timer;
-
-  BubbleState? bubbleState;
-
   late SpriteAnimation _pendingBubbleAnimation;
 
   late SpriteAnimation _blowingBubbleAnimation;
 
+  final bool debugMode;
+
+  final Vector2 gridSize;
+
+  late BubbleModel bubbleModel;
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
+
     await _loadAnimations();
 
-    this.position = player.position;
+    this.position = bubbleModel.position;
     this.size = gridSize;
   }
 
   Bubble.dropByPlayer(
-      {required this.player, required this.gridSize, this.debugMode = false}) {
-    this.debugMode = debugMode;
-
-    bubbleState = BubbleState.pending;
-    timer = Timer(2, onTick: () => bubbleState = BubbleState.destroyed);
-    timer?.start();
+      {required Player player,
+      required this.gridSize,
+      this.debugMode = false}) {
+    bubbleModel = BubbleModel(
+        player: player,
+        position: player.position,
+        onBubbleStateChange: (bubbleState) =>
+            _onBubbleStateChange(bubbleState));
   }
 
   @override
   void update(double dt) {
     super.update(dt);
 
-    timer?.update(dt);
-    if (timer != null &&
-        timer!.progress > 0.8 &&
-        bubbleState == BubbleState.pending) {
-      bubbleState = BubbleState.blowing;
-    }
+    bubbleModel.countDown(dt);
+  }
 
+  void _onBubbleStateChange(BubbleState bubbleState) {
     switch (bubbleState) {
       case BubbleState.pending:
         animation = _pendingBubbleAnimation;
@@ -79,11 +77,7 @@ class Bubble extends SpriteAnimationComponent with HasGameRef<CandyManGame> {
             stepTime: 0.05,
             amountPerRow: 3,
             loop: false));
-  }
-}
 
-enum BubbleState {
-  pending,
-  blowing,
-  destroyed,
+    animation = _pendingBubbleAnimation;
+  }
 }
