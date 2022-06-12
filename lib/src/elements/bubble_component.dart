@@ -22,8 +22,9 @@ class BubbleComponent extends SpriteAnimationComponent
     this.position = bubbleModel.position;
     this.size = gameRef.gridSize;
 
-    add(CircleHitbox.relative(0.7,
-        parentSize: size, position: Vector2.all(size.x * 0.3 / 2)));
+    add(RectangleHitbox(
+        size: size * 0.8,
+        position: Vector2.all(size.x * 0.2 / 2)));
   }
 
   BubbleComponent.dropByPlayer(

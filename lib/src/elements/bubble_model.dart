@@ -22,7 +22,7 @@ class BubbleModel extends GameElement with CountDownMixin {
   BubbleModel({
     required this.player,
     required this.position,
-    countDown = 10.0,
+    countDown = 30.0,
     OnElementDestroy? onBubbleDestroy,
     this.debugMode = false,
   }) : _bubbleState = BubbleState.pending {
@@ -41,7 +41,7 @@ class BubbleModel extends GameElement with CountDownMixin {
   Vector2 position;
 
   @override
-  BubbleComponent create() {
+  Future<BubbleComponent> create() async {
     component =
         BubbleComponent.dropByPlayer(bubbleModel: this, debugMode: debugMode);
     _countDownTimer.start();

@@ -1,18 +1,18 @@
-import 'package:candy_man/src/elements/bubble_model.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_model.dart';
+import 'package:candy_man/src/game_world/boundaries.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_buttons.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:candy_man/src/joy_stick/joy_stick.dart';
 import 'package:flame/game.dart';
-import 'package:flame/palette.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 import '../style/palette.dart';
 
-class CandyManGame extends FlameGame
+class CandyManGame extends Forge2DGame
     with HasTappables, HasDraggables, HasCollisionDetection {
   static final _log = Logger('CandyManGame');
 
@@ -25,13 +25,19 @@ class CandyManGame extends FlameGame
 
   late GameWorld gameWorld;
 
-  CandyManGame({required this.color, this.debugMode = false});
+  late List<Wall> boundaries;
+
+  CandyManGame({required this.color, this.debugMode = false})
+      : super(zoom: 1, gravity: Vector2.zero());
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
     _log.info("Start loading the game");
+
+    boundaries = createBoundaries(this);
+    boundaries.forEach(add);
 
     onGameResize(this.size);
 
@@ -41,16 +47,17 @@ class CandyManGame extends FlameGame
 
     var actionController = ActionController();
 
-    var player = PlayerModel(
+    var playerModel = PlayerModel(
         character: 'm1',
         actionController: actionController,
         position: Vector2.zero(),
         debugMode: debugMode);
 
-//    add(player.create());
-//    add(BubbleModel(player: player, position: Vector2(0,0),debugMode: ).create());
-
-    gameWorld.addMyPlayer(player.create());
+    var myPlayer = await playerModel.create();
+    add(myPlayer);
+    myPlayer.mounted.whenComplete(() => camera.followBodyComponent(myPlayer,
+        worldBounds: Rect.fromLTRB(0 - cameraSafeZone, 0 - cameraSafeZone,
+            worldSize.x + cameraSafeZone, worldSize.y + cameraSafeZone)));
     add(Joystick(actionController: actionController, debugMode: debugMode));
     add(ActionButtons(
         actionController: actionController, debugMode: debugMode));

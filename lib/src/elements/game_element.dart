@@ -15,7 +15,7 @@ abstract class GameElement {
   /**
    * Creates flame component from element model.
    */
-  Component create();
+  Future<Component> create();
 }
 
 enum ElementType {
@@ -32,7 +32,7 @@ mixin MovableMixin on GameElement {
   /**
    * Move to a new position.
    */
-  Vector2 moveTo(Vector2 newPosition);
+  Vector2 moveTo({required Vector2 newPosition, CanMoveTo? canMoveTo});
 }
 
 /**
@@ -41,3 +41,5 @@ mixin MovableMixin on GameElement {
 mixin CountDownMixin on GameElement {
   void countDown(double dt);
 }
+
+typedef CanMoveTo = bool Function(Vector2 position);

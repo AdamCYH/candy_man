@@ -168,7 +168,14 @@ packages:
       name: flame
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.1"
+    version: "1.2.0"
+  flame_forge2d:
+    dependency: "direct main"
+    description:
+      name: flame_forge2d
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.12.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -198,6 +205,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  forge2d:
+    dependency: transitive
+    description:
+      name: forge2d
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.11.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -730,4 +744,4 @@ packages:
     version: "3.1.1"
 sdks:
   dart: ">=2.17.0-206.0.dev <3.0.0"
-  flutter: ">=2.8.1"
+  flutter: ">=2.10.0"

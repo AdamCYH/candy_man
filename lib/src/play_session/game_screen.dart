@@ -23,6 +23,6 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return GameWidget(
         game: CandyManGame(
-            color: Provider.of<Palette>(context), debugMode: true));
+            color: Provider.of<Palette>(context), debugMode: false));
   }
 }

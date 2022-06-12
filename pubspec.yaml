@@ -30,6 +30,7 @@ dependencies:
   in_app_purchase: ^3.0.1  # In-app purchases
 
   flame: ^1.1.1
+  flame_forge2d: ^0.12.0
 
 dev_dependencies:
   flutter_test:
