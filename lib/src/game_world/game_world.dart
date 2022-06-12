@@ -55,15 +55,18 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
 
   Future<BubbleModel?> dropBubble(PlayerModel player) async {
     var indexPosition = toIndexPosition(player.position);
-    var x = indexPosition[0];
-    var y = indexPosition[1];
+    print('----');
+    print(player.position);
+    print(gameRef.gridSize);
+    print(indexPosition);
+    var x = indexPosition.x;
+    var y = indexPosition.y;
     if (tileMap[x][y] != null) {
       return null;
     }
     var bubble = BubbleModel(
         player: player,
-        position: Vector2.zero(),
-//        position: toPixelPosition(toIndexPosition(player.position)),
+        position: toPixelPosition(toIndexPosition(player.position)),
         onBubbleDestroy: () {
           tileMap[x][y] = null;
         },
@@ -73,10 +76,10 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
     return bubble;
   }
 
-  List<int> toIndexPosition(Vector2 position) {
-    var x = (position.x / gameRef.gridSize.x).round();
-    var y = (position.y / gameRef.gridSize.y).round();
-    return [x, y];
+  IndexPosition toIndexPosition(Vector2 position) {
+    var x = (position.x / gameRef.gridSize.x).floor();
+    var y = (position.y / gameRef.gridSize.y).floor();
+    return IndexPosition(x, y);
   }
 
 //  Vector2 toPixelPosition(List<int> index) {
@@ -85,7 +88,8 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
 //  }
 
   Vector2 toPixelPosition(IndexPosition index) {
-    return Vector2(index.x * gameRef.gridSize.x, index.y * gameRef.gridSize.y);
+    return Vector2(index.x * gameRef.gridSize.x + gameRef.gridSize.x / 2,
+        index.y * gameRef.gridSize.y + gameRef.gridSize.y / 2);
   }
 
   bool canMoveTo(Vector2 position) {
@@ -111,4 +115,9 @@ class IndexPosition {
   final int y;
 
   const IndexPosition(this.x, this.y);
+
+  @override
+  String toString() {
+    return '$x $y';
+  }
 }

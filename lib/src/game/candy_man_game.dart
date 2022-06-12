@@ -1,3 +1,4 @@
+import 'package:candy_man/src/elements/bubble_model.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game_world/boundaries.dart';
@@ -47,6 +48,10 @@ class CandyManGame extends Forge2DGame
 
     var actionController = ActionController();
 
+    add(Joystick(actionController: actionController, debugMode: debugMode));
+    add(ActionButtons(
+        actionController: actionController, debugMode: debugMode));
+
     var playerModel = PlayerModel(
         character: 'm1',
         actionController: actionController,
@@ -58,9 +63,7 @@ class CandyManGame extends Forge2DGame
     myPlayer.mounted.whenComplete(() => camera.followBodyComponent(myPlayer,
         worldBounds: Rect.fromLTRB(0 - cameraSafeZone, 0 - cameraSafeZone,
             worldSize.x + cameraSafeZone, worldSize.y + cameraSafeZone)));
-    add(Joystick(actionController: actionController, debugMode: debugMode));
-    add(ActionButtons(
-        actionController: actionController, debugMode: debugMode));
+    add(await BubbleModel(player: playerModel, position: Vector2(100,100)).create());
   }
 
   @override

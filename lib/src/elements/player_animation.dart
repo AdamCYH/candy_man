@@ -2,11 +2,14 @@ import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:logging/logging.dart';
 
 const playerSpriteMap = {"m1": "Male 01-1.png"};
 
 class PlayerAnimation extends SpriteAnimationComponent
-    with HasGameRef<CandyManGame>, CollisionCallbacks {
+    with HasGameRef<CandyManGame> {
+  static final _log = Logger('PlayerAnimation');
+
   static const _animationFrameAmount = 3;
   static const _animationStepTime = 0.1;
   static const _animationPerRow = 3;
@@ -33,7 +36,7 @@ class PlayerAnimation extends SpriteAnimationComponent
 
   @override
   Future<void> onLoad() async {
-    print('Loading player animiation');
+    _log.info('Loading player animiation');
     super.onLoad();
     anchor = Anchor.center;
     super.priority = _playerPriority;

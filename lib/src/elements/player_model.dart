@@ -1,4 +1,3 @@
-import 'package:candy_man/src/elements/bubble_component.dart';
 import 'package:candy_man/src/elements/bubble_model.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_component.dart';
@@ -8,7 +7,7 @@ import 'package:flame/components.dart';
 import 'package:logging/logging.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-class PlayerModel extends GameElement with MovableMixin {
+class PlayerModel extends GameElement {
   static final _log = Logger('CandyManGame');
 
   final String character;
@@ -34,7 +33,7 @@ class PlayerModel extends GameElement with MovableMixin {
       {required this.character,
       required this.actionController,
       required this.position,
-      this.speed = 10000,
+      this.speed = 300,
       this.collidable = true,
       this.debugMode = false})
       : _playerMovementState = PlayerMovementState.idle;
@@ -49,14 +48,6 @@ class PlayerModel extends GameElement with MovableMixin {
     return component;
   }
 
-  @override
-  Vector2 moveTo({required Vector2 newPosition, CanMoveTo? canMoveTo}) {
-    if (canMoveTo?.call(newPosition) ?? true) {
-      position = newPosition;
-    }
-    return position;
-  }
-
   PlayerMovementState get playerMovementState => _playerMovementState;
 
   Direction get moveDirection => _moveDirection;
@@ -65,28 +56,28 @@ class PlayerModel extends GameElement with MovableMixin {
     _playerMovementState = PlayerMovementState.movingUp;
     _moveDirection = Direction.up;
     component.animation.updateMovementState(_playerMovementState);
-    component.body.applyLinearImpulse(moveDirection.vector * speed);
+    component.body.linearVelocity = moveDirection.vector * speed;
   }
 
   void walkDown() {
     _playerMovementState = PlayerMovementState.movingDown;
     _moveDirection = Direction.down;
     component.animation.updateMovementState(_playerMovementState);
-    component.body.applyLinearImpulse(moveDirection.vector * speed);
+    component.body.linearVelocity = moveDirection.vector * speed;
   }
 
   void walkLeft() {
     _playerMovementState = PlayerMovementState.movingLeft;
     _moveDirection = Direction.left;
     component.animation.updateMovementState(_playerMovementState);
-    component.body.applyLinearImpulse(moveDirection.vector * speed);
+    component.body.linearVelocity = moveDirection.vector * speed;
   }
 
   void walkRight() {
     _playerMovementState = PlayerMovementState.movingRight;
     _moveDirection = Direction.right;
     component.animation.updateMovementState(_playerMovementState);
-    component.body.applyLinearImpulse(moveDirection.vector * speed);
+    component.body.linearVelocity = moveDirection.vector * speed;
   }
 
   void idle() {
@@ -94,20 +85,20 @@ class PlayerModel extends GameElement with MovableMixin {
     _moveDirection = Direction.idle;
     component.animation.updateMovementState(_playerMovementState);
     component.body.linearVelocity = Vector2.zero();
-//    component.body.applyLinearImpulse(moveDirection.reverse.vector * speed);
   }
 
-  void collisionStart(GameElement model) {
-    print('in just dropped ' + _onDroppedBubbles.contains(model).toString());
-    if (!_onDroppedBubbles.contains(model)) {
-      _collisions[model] = moveDirection;
-    }
-  }
-
-  void collisionEnd(GameElement model) {
-    _collisions.remove(model);
-  }
-
+//
+//  void collisionStart(GameElement model) {
+//    print('in just dropped ' + _onDroppedBubbles.contains(model).toString());
+//    if (!_onDroppedBubbles.contains(model)) {
+//      _collisions[model] = moveDirection;
+//    }
+//  }
+//
+//  void collisionEnd(GameElement model) {
+//    _collisions.remove(model);
+//  }
+//
   Future<void> dropBubble(GameWorld gameWorld) async {
     var bubble = await gameWorld.dropBubble(this);
     if (bubble != null) {
@@ -115,10 +106,10 @@ class PlayerModel extends GameElement with MovableMixin {
     }
   }
 
-  /// Move away from initially dropped bubble, and make that bubble collidable.
-  void stepOutOfBubble(BubbleComponent bubbleComponent) {
-    _onDroppedBubbles.remove(bubbleComponent.bubbleModel);
-  }
+//  /// Move away from initially dropped bubble, and make that bubble collidable.
+//  void stepOutOfBubble(BubbleComponent bubbleComponent) {
+//    _onDroppedBubbles.remove(bubbleComponent.bubbleModel);
+//  }
 }
 
 enum PlayerMovementState { movingUp, movingDown, movingLeft, movingRight, idle }

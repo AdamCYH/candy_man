@@ -4,8 +4,11 @@ import 'package:candy_man/src/game/candy_man_game.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:logging/logging.dart';
 
 class PlayerComponent extends BodyComponent<CandyManGame> {
+  static final _log = Logger('PlayerComponent');
+
   final PlayerModel playerModel;
 
   late final PlayerAnimation animation;
@@ -14,29 +17,29 @@ class PlayerComponent extends BodyComponent<CandyManGame> {
 
   ActionType? _previousAction;
 
-  late BodyDef bodyDef;
-
   PlayerComponent({
     required this.playerModel,
     this.indexPosition = const IndexPosition(0, 0),
     debugMode = false,
   }) {
-    print('Initiate player component');
+    _log.info('Initiate player component');
     this.debugMode = debugMode;
     renderBody = false;
 
-    animation = PlayerAnimation(character: playerModel.character);
+    animation =
+        PlayerAnimation(character: playerModel.character, debugMode: debugMode);
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    print('Loading player component');
+    _log.info('Loading player component');
 
     add(animation);
 
     playerModel.actionController.onFire.listen((event) {
-      if (_previousAction == event.actionType) return;
+      if (event.actionType == ActionType.idle &&
+          _previousAction == ActionType.idle) return;
       print('trigger joystick ' + event.actionType.toString());
       _previousAction = event.actionType;
       switch (event.actionType) {
@@ -56,7 +59,7 @@ class PlayerComponent extends BodyComponent<CandyManGame> {
           playerModel.idle();
           return;
         case ActionType.dropBubble:
-//          playerModel.dropBubble(gameRef.gameWorld);
+          playerModel.dropBubble(gameRef.gameWorld);
           return;
         default:
           playerModel.idle();
@@ -74,10 +77,10 @@ class PlayerComponent extends BodyComponent<CandyManGame> {
       userData: playerModel, // To be able to determine object in collision
       restitution: 0,
       density: 0,
-      friction: 1,
+      friction: 0,
     );
 
-    bodyDef = BodyDef(
+    final bodyDef = BodyDef(
       position: _toPixelPosition(indexPosition),
       linearVelocity: Vector2.zero(),
       type: BodyType.dynamic,
@@ -89,5 +92,12 @@ class PlayerComponent extends BodyComponent<CandyManGame> {
   Vector2 _toPixelPosition(IndexPosition index) {
     return Vector2(index.x * gameRef.gridSize.x + gameRef.gridSize.x / 2,
         index.y * gameRef.gridSize.y + gameRef.gridSize.y / 2);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    playerModel.position = body.position;
   }
 }

@@ -1,34 +1,38 @@
+import 'dart:ui';
+
+import 'package:candy_man/src/elements/bubble_animation.dart';
 import 'package:candy_man/src/elements/bubble_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
-import 'package:flame/collisions.dart';
-import 'package:flame/components.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:logging/logging.dart';
 
-class BubbleComponent extends SpriteAnimationComponent
-    with HasGameRef<CandyManGame> {
-  late SpriteAnimation _pendingBubbleAnimation;
+class BubbleComponent extends BodyComponent<CandyManGame> {
+  static final _log = Logger('BubbleComponent');
 
-  late SpriteAnimation _blowingBubbleAnimation;
+  final BubbleModel bubbleModel;
 
-  final bool debugMode;
+  late final BubbleAnimation animation;
 
-  BubbleModel bubbleModel;
+  BubbleComponent({
+    required this.bubbleModel,
+    debugMode = false,
+  }) {
+    _log.info('Initiate bubble component');
+    this.debugMode = debugMode;
+    this.debugColor = Color.fromRGBO(0, 0, 0, 0.5);
+    renderBody = false;
+
+    animation = BubbleAnimation(debugMode: debugMode);
+  }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    _log.info('Loading bubble component');
+    print('Loading bbbb comp');
 
-    await _loadAnimations();
-
-    this.position = bubbleModel.position;
-    this.size = gameRef.gridSize;
-
-    add(RectangleHitbox(
-        size: size * 0.8,
-        position: Vector2.all(size.x * 0.2 / 2)));
+    add(animation);
   }
-
-  BubbleComponent.dropByPlayer(
-      {required this.bubbleModel, this.debugMode = false});
 
   @override
   void update(double dt) {
@@ -37,44 +41,24 @@ class BubbleComponent extends SpriteAnimationComponent
     bubbleModel.countDown(dt);
   }
 
-  bool get collidable => bubbleModel.collidable;
+  @override
+  Body createBody() {
+    print('Creating bubble body');
+    print(animation);
+    print(animation.size);
+    final shape = PolygonShape()
+      ..setAsBoxXY(gameRef.gridSize.x / 2 * 0.8, gameRef.gridSize.y / 2 * 0.8);
+    final fixtureDef = FixtureDef(
+      shape,
+      userData: bubbleModel, // To be able to determine object in collision
+    );
 
-  void updateBubbleStateChange(BubbleState bubbleState) {
-    switch (bubbleState) {
-      case BubbleState.pending:
-        animation = _pendingBubbleAnimation;
-        return;
-      case BubbleState.blowing:
-        animation = _blowingBubbleAnimation;
-        return;
-      case BubbleState.destroyed:
-        removeFromParent();
-        return;
-      default:
-        return;
-    }
-  }
+    final bodyDef = BodyDef(
+      position: bubbleModel.position,
+      linearVelocity: Vector2.zero(),
+      type: BodyType.static,
+    );
 
-  Future<void> _loadAnimations() async {
-    final spriteSheet = await gameRef.images.load('bubble.png');
-
-    _pendingBubbleAnimation = SpriteAnimation.fromFrameData(
-        spriteSheet,
-        SpriteAnimationData.sequenced(
-            textureSize: Vector2.all(177.0),
-            amount: 2,
-            stepTime: 0.1,
-            amountPerRow: 2));
-
-    _blowingBubbleAnimation = SpriteAnimation.fromFrameData(
-        spriteSheet,
-        SpriteAnimationData.sequenced(
-            textureSize: Vector2.all(177.0),
-            amount: 9,
-            stepTime: 0.05,
-            amountPerRow: 3,
-            loop: false));
-
-    animation = _pendingBubbleAnimation;
+    return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 }
