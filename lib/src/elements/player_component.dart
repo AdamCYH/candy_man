@@ -40,7 +40,7 @@ class PlayerComponent extends BodyComponent<CandyManGame> {
     playerModel.actionController.onFire.listen((event) {
       if (event.actionType == ActionType.idle &&
           _previousAction == ActionType.idle) return;
-      print('trigger joystick ' + event.actionType.toString());
+//      print('trigger joystick ' + event.actionType.toString());
       _previousAction = event.actionType;
       switch (event.actionType) {
         case ActionType.moveUp:
@@ -82,7 +82,6 @@ class PlayerComponent extends BodyComponent<CandyManGame> {
 
     final bodyDef = BodyDef(
       position: _toPixelPosition(indexPosition),
-      linearVelocity: Vector2.zero(),
       type: BodyType.dynamic,
     );
 

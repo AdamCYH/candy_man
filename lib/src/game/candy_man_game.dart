@@ -63,7 +63,6 @@ class CandyManGame extends Forge2DGame
     myPlayer.mounted.whenComplete(() => camera.followBodyComponent(myPlayer,
         worldBounds: Rect.fromLTRB(0 - cameraSafeZone, 0 - cameraSafeZone,
             worldSize.x + cameraSafeZone, worldSize.y + cameraSafeZone)));
-    add(await BubbleModel(player: playerModel, position: Vector2(100,100)).create());
   }
 
   @override

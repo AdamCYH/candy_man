@@ -8,7 +8,7 @@ import 'package:flame/components.dart';
 
 const cameraSafeZone = 20.0;
 
-typedef void OnElementDestroy();
+typedef OnElementDestroy = void Function(GameElement gameElement);
 
 class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
   var _players = <PlayerComponent>[];
@@ -55,10 +55,6 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
 
   Future<BubbleModel?> dropBubble(PlayerModel player) async {
     var indexPosition = toIndexPosition(player.position);
-    print('----');
-    print(player.position);
-    print(gameRef.gridSize);
-    print(indexPosition);
     var x = indexPosition.x;
     var y = indexPosition.y;
     if (tileMap[x][y] != null) {
@@ -67,7 +63,7 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
     var bubble = BubbleModel(
         player: player,
         position: toPixelPosition(toIndexPosition(player.position)),
-        onBubbleDestroy: () {
+        onBubbleDestroy: (_) {
           tileMap[x][y] = null;
         },
         debugMode: player.debugMode);
@@ -82,26 +78,9 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
     return IndexPosition(x, y);
   }
 
-//  Vector2 toPixelPosition(List<int> index) {
-//    return Vector2(
-//        index[0] * gameRef.gridSize.x, index[1] * gameRef.gridSize.y);
-//  }
-
   Vector2 toPixelPosition(IndexPosition index) {
     return Vector2(index.x * gameRef.gridSize.x + gameRef.gridSize.x / 2,
         index.y * gameRef.gridSize.y + gameRef.gridSize.y / 2);
-  }
-
-  bool canMoveTo(Vector2 position) {
-    if (boundary == null) return true;
-    var indexPosition = toIndexPosition(position);
-    return
-//      !(tileMap[indexPosition[0]][indexPosition[1]]?.collidable ??
-//            false) &&
-        position.x >= 0 &&
-            position.x <= boundary!.x &&
-            position.y >= 0 &&
-            position.y <= boundary!.y;
   }
 
   void setBoundary() {

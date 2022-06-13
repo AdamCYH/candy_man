@@ -3,8 +3,10 @@ import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:flame/components.dart';
+import 'package:flame_forge2d/contact_callbacks.dart';
+import 'package:flame_forge2d/flame_forge2d.dart' as forge2d;
 
-class BubbleModel extends GameElement with CountDownMixin {
+class BubbleModel extends GameElement with CountDownMixin, ContactCallbacks {
   static const explosionDuration = 0.5;
 
   BubbleState _bubbleState;
@@ -22,7 +24,7 @@ class BubbleModel extends GameElement with CountDownMixin {
   BubbleModel({
     required this.player,
     required this.position,
-    countDown = 5.0,
+    countDown = 30.0,
     OnElementDestroy? onBubbleDestroy,
     this.debugMode = false,
   }) : _bubbleState = BubbleState.pending {
@@ -30,7 +32,8 @@ class BubbleModel extends GameElement with CountDownMixin {
         onTick: () => {bubbleState = BubbleState.blowing}, autoStart: false);
     _explosionTimer = Timer(countDown + explosionDuration, onTick: () {
       bubbleState = BubbleState.destroyed;
-      onBubbleDestroy?.call();
+      component?.removeFromParent();
+      onBubbleDestroy?.call(this);
     }, autoStart: false);
   }
 
@@ -54,12 +57,18 @@ class BubbleModel extends GameElement with CountDownMixin {
     _explosionTimer.update(dt);
   }
 
+  @override
+  void endContact(Object other, forge2d.Contact contact) {
+    if (identical(other, player)) {
+      component?.makeColliable();
+    }
+  }
+
   BubbleState get bubbleState => _bubbleState;
 
   set bubbleState(BubbleState state) {
     _bubbleState = state;
     component?.animation.updateBubbleStateChange(state);
-    component?.removeFromParent();
   }
 }
 

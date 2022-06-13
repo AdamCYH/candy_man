@@ -1,6 +1,5 @@
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
-import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:logging/logging.dart';
 
@@ -47,8 +46,6 @@ class PlayerAnimation extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-
-//    position = playerModel.moveFor(dt);
   }
 
   @override
@@ -57,29 +54,6 @@ class PlayerAnimation extends SpriteAnimationComponent
 
     this.size = gameRef.gridSize;
   }
-
-//
-//  @override
-//  void onCollisionStart(Set<Vector2> points, PositionComponent other) {
-//    super.onCollisionStart(points, other);
-//    print('start');
-//    print(points);
-//    if (other is ScreenHitbox) {
-//      //...
-//    } else if (other is BubbleComponent) {
-//      playerModel.collisionStart(other.bubbleModel);
-//    }
-//  }
-//
-//  @override
-//  void onCollisionEnd(PositionComponent other) {
-//    super.onCollisionEnd(other);
-//    print('end');
-//    if (other is BubbleComponent) {
-//      playerModel.stepOutOfBubble(other);
-//      playerModel.collisionEnd(other.bubbleModel);
-//    }
-//  }
 
   void updateMovementState(PlayerMovementState playerMovementState) {
     switch (playerMovementState) {

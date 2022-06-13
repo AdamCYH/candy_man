@@ -29,7 +29,6 @@ class BubbleComponent extends BodyComponent<CandyManGame> {
   Future<void> onLoad() async {
     super.onLoad();
     _log.info('Loading bubble component');
-    print('Loading bbbb comp');
 
     add(animation);
   }
@@ -43,22 +42,19 @@ class BubbleComponent extends BodyComponent<CandyManGame> {
 
   @override
   Body createBody() {
-    print('Creating bubble body');
-    print(animation);
-    print(animation.size);
     final shape = PolygonShape()
-      ..setAsBoxXY(gameRef.gridSize.x / 2 * 0.8, gameRef.gridSize.y / 2 * 0.8);
-    final fixtureDef = FixtureDef(
-      shape,
-      userData: bubbleModel, // To be able to determine object in collision
-    );
+      ..setAsBoxXY(gameRef.gridSize.x / 2 * 0.9, gameRef.gridSize.y / 2 * 0.9);
+    final fixtureDef = FixtureDef(shape, userData: bubbleModel, isSensor: true);
 
     final bodyDef = BodyDef(
       position: bubbleModel.position,
-      linearVelocity: Vector2.zero(),
       type: BodyType.static,
     );
 
     return world.createBody(bodyDef)..createFixture(fixtureDef);
+  }
+
+  void makeColliable() {
+    body.fixtures[0].setSensor(false);
   }
 }

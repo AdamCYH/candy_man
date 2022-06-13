@@ -4,6 +4,7 @@ import 'package:candy_man/src/elements/player_component.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:flame/components.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:logging/logging.dart';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -87,29 +88,12 @@ class PlayerModel extends GameElement {
     component.body.linearVelocity = Vector2.zero();
   }
 
-//
-//  void collisionStart(GameElement model) {
-//    print('in just dropped ' + _onDroppedBubbles.contains(model).toString());
-//    if (!_onDroppedBubbles.contains(model)) {
-//      _collisions[model] = moveDirection;
-//    }
-//  }
-//
-//  void collisionEnd(GameElement model) {
-//    _collisions.remove(model);
-//  }
-//
   Future<void> dropBubble(GameWorld gameWorld) async {
     var bubble = await gameWorld.dropBubble(this);
     if (bubble != null) {
       _onDroppedBubbles.add(bubble);
     }
   }
-
-//  /// Move away from initially dropped bubble, and make that bubble collidable.
-//  void stepOutOfBubble(BubbleComponent bubbleComponent) {
-//    _onDroppedBubbles.remove(bubbleComponent.bubbleModel);
-//  }
 }
 
 enum PlayerMovementState { movingUp, movingDown, movingLeft, movingRight, idle }
