@@ -3,7 +3,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 List<Wall> createBoundaries(CandyManGame game) {
   final topLeft = Vector2.zero();
-  final bottomRight = game.screenToWorld(game.worldSize);
+  final bottomRight = game.screenToWorld(game.worldSize * game.camera.zoom);
   final topRight = Vector2(bottomRight.x, topLeft.y);
   final bottomLeft = Vector2(topLeft.x, bottomRight.y);
   return [

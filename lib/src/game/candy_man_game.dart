@@ -29,7 +29,7 @@ class CandyManGame extends Forge2DGame
   late List<Wall> boundaries;
 
   CandyManGame({required this.color, this.debugMode = false})
-      : super(zoom: 1, gravity: Vector2.zero());
+      : super(zoom: 5, gravity: Vector2.zero());
 
   @override
   Future<void> onLoad() async {
@@ -39,8 +39,6 @@ class CandyManGame extends Forge2DGame
 
     boundaries = createBoundaries(this);
     boundaries.forEach(add);
-
-    onGameResize(this.size);
 
     gameWorld = GameWorld(tileMap: _createTestTileMap());
 
@@ -60,6 +58,10 @@ class CandyManGame extends Forge2DGame
 
     var myPlayer = await playerModel.create();
     add(myPlayer);
+
+    add(await BubbleModel(player: playerModel, position: Vector2(400, 190))
+        .create());
+
     myPlayer.mounted.whenComplete(() => camera.followBodyComponent(myPlayer,
         worldBounds: Rect.fromLTRB(0 - cameraSafeZone, 0 - cameraSafeZone,
             worldSize.x + cameraSafeZone, worldSize.y + cameraSafeZone)));
@@ -72,9 +74,19 @@ class CandyManGame extends Forge2DGame
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
 
-    worldSize = Vector2(size.x, size.x / gameGridLayout.x * gameGridLayout.y);
+    worldSize = Vector2(camera.gameSize.x,
+        camera.gameSize.x / gameGridLayout.x * gameGridLayout.y);
     gridSize =
         Vector2(worldSize.x / gameGridLayout.x, worldSize.y / gameGridLayout.y);
+
+    print('==========');
+    print('World size: ' + worldSize.toString());
+    print('Canvas size: ' + canvasSize.toString());
+    print('on gamre resize:' + size.toString());
+    print('Size: ' + this.size.toString());
+    print('Camera game size: ' + camera.gameSize.toString());
+    print(
+        'Viewport effective size: ' + camera.viewport.effectiveSize.toString());
   }
 
   List<List<GameElement?>> _createTestTileMap() {

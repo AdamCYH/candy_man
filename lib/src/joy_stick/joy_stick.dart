@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:candy_man/src/game/candy_man_game.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
+import 'package:candy_man/src/style/component_priority.dart';
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
@@ -23,8 +24,10 @@ class Joystick extends PositionComponent with HasGameRef<CandyManGame> {
   late JoystickComponent joystick;
 
   Joystick({required this.actionController, debugMode = false}) {
-    super.anchor = Anchor.center;
-    super.debugMode = debugMode;
+    this.anchor = Anchor.center;
+    this.debugMode = debugMode;
+    this.positionType = PositionType.viewport;
+    this.priority = ComponentPriority.hud;
   }
 
   @override
@@ -32,7 +35,6 @@ class Joystick extends PositionComponent with HasGameRef<CandyManGame> {
     super.onLoad();
     _log.info("Loading joystick");
 
-    this.positionType = PositionType.viewport;
     loadJoystick();
   }
 
@@ -90,6 +92,7 @@ class Joystick extends PositionComponent with HasGameRef<CandyManGame> {
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    super.position = Vector2(100, gameRef.size.y - 100);
+
+    this.position = Vector2(100, gameRef.canvasSize.y - 100);
   }
 }

@@ -34,7 +34,7 @@ class PlayerModel extends GameElement {
       {required this.character,
       required this.actionController,
       required this.position,
-      this.speed = 300,
+      this.speed = 3000,
       this.collidable = true,
       this.debugMode = false})
       : _playerMovementState = PlayerMovementState.idle;

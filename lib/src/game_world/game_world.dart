@@ -6,7 +6,7 @@ import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
 import 'package:flame/components.dart';
 
-const cameraSafeZone = 20.0;
+const cameraSafeZone = 5.0;
 
 typedef OnElementDestroy = void Function(GameElement gameElement);
 
@@ -25,27 +25,18 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
 
     sprite = await gameRef.loadSprite('worlds/world_1.png');
     size = gameRef.worldSize;
-
-    setBoundary();
   }
 
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
 
-    this.size = gameRef.gridSize;
-    setBoundary();
+    this.size = gameRef.worldSize;
   }
 
   void addMyPlayer(PlayerComponent player) {
     _players.add(player);
     add(player);
-//    gameRef.camera.followBodyComponent(player,
-//        worldBounds: Rect.fromLTRB(
-//            0 - cameraSafeZone,
-//            0 - cameraSafeZone,
-//            gameRef.worldSize.x + cameraSafeZone,
-//            gameRef.worldSize.y + cameraSafeZone));
   }
 
   void addOtherPlayer(PlayerAnimation player) {
@@ -81,11 +72,6 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
   Vector2 toPixelPosition(IndexPosition index) {
     return Vector2(index.x * gameRef.gridSize.x + gameRef.gridSize.x / 2,
         index.y * gameRef.gridSize.y + gameRef.gridSize.y / 2);
-  }
-
-  void setBoundary() {
-    boundary = Vector2(gameRef.worldSize.x - gameRef.gridSize.x,
-        gameRef.worldSize.y - gameRef.gridSize.y);
   }
 }
 
