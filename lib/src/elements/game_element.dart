@@ -21,6 +21,7 @@ abstract class GameElement {
 enum ElementType {
   player,
   bubble,
+  explosion,
   obstacle,
   movable_obstacle,
 }
@@ -43,3 +44,5 @@ mixin CountDownMixin on GameElement {
 }
 
 typedef CanMoveTo = bool Function(Vector2 position);
+
+typedef OnElementDestroy = void Function(GameElement gameElement);

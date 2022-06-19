@@ -1,13 +1,29 @@
 import 'package:candy_man/src/elements/bubble_component.dart';
+import 'package:candy_man/src/elements/direction.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_model.dart';
-import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/contact_callbacks.dart';
 import 'package:flame_forge2d/flame_forge2d.dart' as forge2d;
 
+typedef OnBubbleCountDownEnd = void Function(BubbleModel bubble);
+
+enum BubbleState {
+  pending,
+  blowing,
+  destroyed,
+}
+
+/// Key: [Direction], Value: isVertical
+const bubbleDirections = {
+  Direction.up: true,
+  Direction.right: false,
+  Direction.down: true,
+  Direction.left: false
+};
+
 class BubbleModel extends GameElement with CountDownMixin, ContactCallbacks {
-  static const explosionDuration = 0.5;
+  static const explosionDuration = 30;
 
   BubbleState _bubbleState;
 
@@ -24,12 +40,15 @@ class BubbleModel extends GameElement with CountDownMixin, ContactCallbacks {
   BubbleModel({
     required this.player,
     required this.position,
-    countDown = 30.0,
+    countDown = 5.0,
+    OnBubbleCountDownEnd? onBubbleCountDownEnd,
     OnElementDestroy? onBubbleDestroy,
     this.debugMode = false,
   }) : _bubbleState = BubbleState.pending {
-    _countDownTimer = Timer(countDown,
-        onTick: () => {bubbleState = BubbleState.blowing}, autoStart: false);
+    _countDownTimer = Timer(countDown, onTick: () {
+      bubbleState = BubbleState.blowing;
+      onBubbleCountDownEnd?.call(this);
+    }, autoStart: false);
     _explosionTimer = Timer(countDown + explosionDuration, onTick: () {
       bubbleState = BubbleState.destroyed;
       component?.removeFromParent();
@@ -70,10 +89,4 @@ class BubbleModel extends GameElement with CountDownMixin, ContactCallbacks {
     _bubbleState = state;
     component?.animation.updateBubbleStateChange(state);
   }
-}
-
-enum BubbleState {
-  pending,
-  blowing,
-  destroyed,
 }

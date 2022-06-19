@@ -1,19 +1,19 @@
 import 'package:candy_man/src/elements/bubble_model.dart';
-import 'package:candy_man/src/elements/game_element.dart';
+import 'package:candy_man/src/elements/direction.dart';
+import 'package:candy_man/src/elements/explosion_model.dart';
 import 'package:candy_man/src/elements/player_animation.dart';
 import 'package:candy_man/src/elements/player_component.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
+import 'package:candy_man/src/game_world/map.dart';
 import 'package:flame/components.dart';
 
 const cameraSafeZone = 5.0;
 
-typedef OnElementDestroy = void Function(GameElement gameElement);
-
 class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
-  var _players = <PlayerComponent>[];
+  final _players = <PlayerComponent>[];
 
-  List<List<GameElement?>> tileMap;
+  GameMap tileMap;
 
   Vector2? boundary;
 
@@ -45,27 +45,38 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
   }
 
   Future<BubbleModel?> dropBubble(PlayerModel player) async {
-    var indexPosition = toIndexPosition(player.position);
-    var x = indexPosition.x;
-    var y = indexPosition.y;
-    if (tileMap[x][y] != null) {
+    final indexPosition = toIndexPosition(player.position);
+    final x = indexPosition.x;
+    final y = indexPosition.y;
+    if (tileMap.get(x, y) != null) {
       return null;
     }
-    var bubble = BubbleModel(
+
+    var explosions = <ExplosionModel>[];
+
+    final bubble = BubbleModel(
         player: player,
-        position: toPixelPosition(toIndexPosition(player.position)),
+        position: toPixelPosition(indexPosition),
+        onBubbleCountDownEnd: (bubble) {
+          explosions = _explode(bubble, indexPosition);
+          explosions
+              .forEach((explosion) async => add(await explosion.create()));
+        },
         onBubbleDestroy: (_) {
-          tileMap[x][y] = null;
+          tileMap.set(x, y, null);
+          explosions.forEach((explosion) {
+            remove(explosion.component!);
+          });
         },
         debugMode: player.debugMode);
-    tileMap[x][y] = bubble;
+    tileMap.set(x, y, bubble);
     add(await bubble.create());
     return bubble;
   }
 
   IndexPosition toIndexPosition(Vector2 position) {
-    var x = (position.x / gameRef.gridSize.x).floor();
-    var y = (position.y / gameRef.gridSize.y).floor();
+    final x = (position.x / gameRef.gridSize.x).floor();
+    final y = (position.y / gameRef.gridSize.y).floor();
     return IndexPosition(x, y);
   }
 
@@ -73,16 +84,24 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
     return Vector2(index.x * gameRef.gridSize.x + gameRef.gridSize.x / 2,
         index.y * gameRef.gridSize.y + gameRef.gridSize.y / 2);
   }
-}
 
-class IndexPosition {
-  final int x;
-  final int y;
+  List<ExplosionModel> _explode(
+      BubbleModel bubble, IndexPosition indexPosition) {
+    final explosions = <ExplosionModel>[];
+    for (final direction in bubbleDirections.keys) {
+      var step = 1;
+      var targetPosition = indexPosition.add(direction);
+      while (step <= bubble.player.bubblePower &&
+          tileMap.isInBoundary(targetPosition.x, targetPosition.y)) {
+        final explosion = ExplosionModel(
+            position: toPixelPosition(targetPosition),
+            isVertical: bubbleDirections[direction]!);
+        explosions.add(explosion);
 
-  const IndexPosition(this.x, this.y);
-
-  @override
-  String toString() {
-    return '$x $y';
+        step++;
+        targetPosition = targetPosition.add(direction);
+      }
+    }
+    return explosions;
   }
 }

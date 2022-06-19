@@ -1,12 +1,11 @@
-import 'package:candy_man/src/elements/bubble_model.dart';
+import 'package:candy_man/src/elements/direction.dart';
+import 'package:candy_man/src/elements/explosion_model.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_component.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
-import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:logging/logging.dart';
-import 'package:vector_math/vector_math_64.dart';
 
 class PlayerModel extends GameElement {
   static final _log = Logger('CandyManGame');
@@ -20,21 +19,19 @@ class PlayerModel extends GameElement {
 
   bool debugMode;
   Vector2 position;
+
   bool collidable;
   double speed;
+  int bubblePower;
 
   late final PlayerComponent component;
-
-  /// Bubbles initially dropped by user do not collide until user moving out.
-  var _onDroppedBubbles = <BubbleModel>{};
-
-  var _collisions = <GameElement, Direction>{};
 
   PlayerModel(
       {required this.character,
       required this.actionController,
       required this.position,
-      this.speed = 3000,
+      this.speed = 50,
+      this.bubblePower = 3,
       this.collidable = true,
       this.debugMode = false})
       : _playerMovementState = PlayerMovementState.idle;
@@ -89,52 +86,8 @@ class PlayerModel extends GameElement {
   }
 
   Future<void> dropBubble(GameWorld gameWorld) async {
-    var bubble = await gameWorld.dropBubble(this);
-    if (bubble != null) {
-      _onDroppedBubbles.add(bubble);
-    }
+    await gameWorld.dropBubble(this);
   }
 }
 
 enum PlayerMovementState { movingUp, movingDown, movingLeft, movingRight, idle }
-
-enum Direction {
-  up(Movement(0, -1)),
-  down(Movement(0, 1)),
-  left(Movement(-1, 0)),
-  right(Movement(1, 0)),
-  idle(Movement(0, 0));
-
-  final Movement movement;
-
-  const Direction(this.movement);
-}
-
-extension DirectionExtension on Direction {
-  Vector2 get vector {
-    return Vector2(movement.x, movement.y);
-  }
-
-  Direction get reverse {
-    switch (this) {
-      case Direction.up:
-        return Direction.down;
-      case Direction.down:
-        return Direction.up;
-      case Direction.left:
-        return Direction.right;
-      case Direction.right:
-        return Direction.left;
-      case Direction.idle:
-        break;
-    }
-    return Direction.idle;
-  }
-}
-
-class Movement {
-  final double x;
-  final double y;
-
-  const Movement(this.x, this.y);
-}

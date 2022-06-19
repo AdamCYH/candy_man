@@ -3,6 +3,7 @@ import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game_world/boundaries.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
+import 'package:candy_man/src/game_world/map.dart';
 import 'package:candy_man/src/joy_stick/action_buttons.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:candy_man/src/joy_stick/joy_stick.dart';
@@ -40,7 +41,7 @@ class CandyManGame extends Forge2DGame
     boundaries = createBoundaries(this);
     boundaries.forEach(add);
 
-    gameWorld = GameWorld(tileMap: _createTestTileMap());
+    gameWorld = GameWorld(tileMap: GameMap(tileMap: _createTestTileMap()));
 
     add(gameWorld);
 
@@ -91,9 +92,9 @@ class CandyManGame extends Forge2DGame
 
   List<List<GameElement?>> _createTestTileMap() {
     var tileMap = <List<GameElement?>>[];
-    for (int i = 0; i < gameGridLayout.x; i++) {
+    for (int i = 0; i < gameGridLayout.y; i++) {
       var row = <GameElement?>[];
-      for (int j = 0; j < gameGridLayout.y; j++) {
+      for (int j = 0; j < gameGridLayout.x; j++) {
         row.add(null);
       }
       tileMap.add(row);

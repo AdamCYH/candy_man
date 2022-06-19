@@ -1,7 +1,7 @@
+import 'package:candy_man/src/elements/direction.dart';
 import 'package:candy_man/src/elements/player_animation.dart';
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
-import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:logging/logging.dart';

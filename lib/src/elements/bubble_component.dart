@@ -8,6 +8,7 @@ import 'package:logging/logging.dart';
 
 class BubbleComponent extends BodyComponent<CandyManGame> {
   static final _log = Logger('BubbleComponent');
+  static final scaleFactor = 0.9;
 
   final BubbleModel bubbleModel;
 
@@ -43,7 +44,8 @@ class BubbleComponent extends BodyComponent<CandyManGame> {
   @override
   Body createBody() {
     final shape = PolygonShape()
-      ..setAsBoxXY(gameRef.gridSize.x / 2 * 0.9, gameRef.gridSize.y / 2 * 0.9);
+      ..setAsBoxXY(gameRef.gridSize.x / 2 * scaleFactor,
+          gameRef.gridSize.y / 2 * scaleFactor);
     final fixtureDef = FixtureDef(shape, userData: bubbleModel, isSensor: true);
 
     final bodyDef = BodyDef(
