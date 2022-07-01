@@ -1,11 +1,16 @@
 import 'package:candy_man/src/elements/direction.dart';
-import 'package:candy_man/src/elements/explosion_model.dart';
 import 'package:candy_man/src/elements/game_element.dart';
 import 'package:candy_man/src/elements/player_component.dart';
 import 'package:candy_man/src/game_world/game_world.dart';
 import 'package:candy_man/src/joy_stick/action_controller.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:logging/logging.dart';
+
+enum PlayerState {
+  active,
+  dying,
+  dead,
+}
 
 class PlayerModel extends GameElement {
   static final _log = Logger('CandyManGame');
@@ -20,9 +25,11 @@ class PlayerModel extends GameElement {
   bool debugMode;
   Vector2 position;
 
+  PlayerState playerState;
   bool collidable;
   double speed;
   int bubblePower;
+  bool isMovable;
 
   late final PlayerComponent component;
 
@@ -30,9 +37,11 @@ class PlayerModel extends GameElement {
       {required this.character,
       required this.actionController,
       required this.position,
+      this.playerState = PlayerState.active,
       this.speed = 50,
-      this.bubblePower = 3,
+      this.bubblePower = 1,
       this.collidable = true,
+      this.isMovable = true,
       this.debugMode = false})
       : _playerMovementState = PlayerMovementState.idle;
 
@@ -83,6 +92,13 @@ class PlayerModel extends GameElement {
     _moveDirection = Direction.idle;
     component.animation.updateMovementState(_playerMovementState);
     component.body.linearVelocity = Vector2.zero();
+  }
+
+  void contactExplosion() {
+    idle();
+    isMovable = false;
+    playerState = PlayerState.dying;
+    component.animation.updatePlayerState(playerState);
   }
 
   Future<void> dropBubble(GameWorld gameWorld) async {

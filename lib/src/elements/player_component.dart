@@ -38,6 +38,8 @@ class PlayerComponent extends BodyComponent<CandyManGame> {
     add(animation);
 
     playerModel.actionController.onFire.listen((event) {
+      if (!playerModel.isMovable) return;
+
       if (event.actionType == ActionType.idle &&
           _previousAction == ActionType.idle) return;
 //      print('trigger joystick ' + event.actionType.toString());

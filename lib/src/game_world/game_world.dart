@@ -88,14 +88,14 @@ class GameWorld extends SpriteComponent with HasGameRef<CandyManGame> {
   List<ExplosionModel> _explode(
       BubbleModel bubble, IndexPosition indexPosition) {
     final explosions = <ExplosionModel>[];
-    for (final direction in bubbleDirections.keys) {
+    for (final direction in bubbleDirections) {
       var step = 1;
       var targetPosition = indexPosition.add(direction);
       while (step <= bubble.player.bubblePower &&
           tileMap.isInBoundary(targetPosition.x, targetPosition.y)) {
         final explosion = ExplosionModel(
             position: toPixelPosition(targetPosition),
-            isVertical: bubbleDirections[direction]!);
+            isVertical: direction.isVertical);
         explosions.add(explosion);
 
         step++;

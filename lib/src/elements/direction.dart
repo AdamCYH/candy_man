@@ -1,15 +1,16 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 enum Direction {
-  up(Movement(0, -1)),
-  down(Movement(0, 1)),
-  left(Movement(-1, 0)),
-  right(Movement(1, 0)),
-  idle(Movement(0, 0));
+  up(Movement(0, -1), true),
+  down(Movement(0, 1), true),
+  left(Movement(-1, 0), false),
+  right(Movement(1, 0), false),
+  idle(Movement(0, 0), false);
 
   final Movement movement;
+  final bool isVertical;
 
-  const Direction(this.movement);
+  const Direction(this.movement, this.isVertical);
 }
 
 extension DirectionExtension on Direction {

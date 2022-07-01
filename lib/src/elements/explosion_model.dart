@@ -24,7 +24,7 @@ class ExplosionModel extends GameElement with ContactCallbacks {
   @override
   void beginContact(Object other, Contact contact) {
     if (other is PlayerModel) {
-      print('You are dead');
+      other.contactExplosion();
     }
   }
 

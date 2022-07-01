@@ -15,15 +15,15 @@ enum BubbleState {
 }
 
 /// Key: [Direction], Value: isVertical
-const bubbleDirections = {
-  Direction.up: true,
-  Direction.right: false,
-  Direction.down: true,
-  Direction.left: false
-};
+const bubbleDirections = [
+  Direction.up,
+  Direction.right,
+  Direction.down,
+  Direction.left
+];
 
 class BubbleModel extends GameElement with CountDownMixin, ContactCallbacks {
-  static const explosionDuration = 30;
+  static const explosionDuration = 0.5;
 
   BubbleState _bubbleState;
 

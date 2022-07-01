@@ -1,9 +1,12 @@
 import 'package:candy_man/src/elements/player_model.dart';
 import 'package:candy_man/src/game/candy_man_game.dart';
+import 'package:candy_man/src/style/component_priority.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 const playerSpriteMap = {"m1": "Male 01-1.png"};
+const dyingBubbleSprite = 'dying_bubble.png';
 
 class PlayerAnimation extends SpriteAnimationComponent
     with HasGameRef<CandyManGame> {
@@ -12,7 +15,6 @@ class PlayerAnimation extends SpriteAnimationComponent
   static const _animationFrameAmount = 3;
   static const _animationStepTime = 0.1;
   static const _animationPerRow = 3;
-  static const _playerPriority = 100;
 
   final _spriteSize = Vector2.all(32.0);
 
@@ -26,6 +28,8 @@ class PlayerAnimation extends SpriteAnimationComponent
 
   late SpriteAnimation _walkRightAnimation;
 
+  late SpriteAnimation _dyingBubbleAnimation;
+
   final bool debugMode;
 
   final String character;
@@ -38,7 +42,7 @@ class PlayerAnimation extends SpriteAnimationComponent
     _log.info('Loading player animiation');
     super.onLoad();
     anchor = Anchor.center;
-    super.priority = _playerPriority;
+    super.priority = ComponentPriority.player;
 
     await _loadAnimations();
   }
@@ -72,6 +76,22 @@ class PlayerAnimation extends SpriteAnimationComponent
       case PlayerMovementState.idle:
       default:
         animation = _idleAnimation;
+        return;
+    }
+  }
+
+  void updatePlayerState(PlayerState playerState) {
+    switch (playerState) {
+      case PlayerState.dying:
+        add(SpriteAnimationComponent(
+            animation: _dyingBubbleAnimation,
+            size: size,
+            paint: Paint()..color = Colors.white.withOpacity(0.5)));
+        return;
+      case PlayerState.dead:
+        return;
+      case PlayerState.active:
+      default:
         return;
     }
   }
@@ -125,6 +145,14 @@ class PlayerAnimation extends SpriteAnimationComponent
             stepTime: _animationStepTime,
             amountPerRow: _animationPerRow,
             texturePosition: Vector2(0, 64)));
+
+    _dyingBubbleAnimation = SpriteAnimation.fromFrameData(
+        await gameRef.images.load(dyingBubbleSprite),
+        SpriteAnimationData.sequenced(
+            textureSize: Vector2.all(200),
+            amount: 4,
+            stepTime: _animationStepTime,
+            amountPerRow: 2));
 
     this.animation = _idleAnimation;
   }
